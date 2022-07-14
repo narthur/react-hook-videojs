@@ -7,6 +7,7 @@
     "plugin:react/all",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
+    "plugin:testing-library/react",
     "prettier"
   ],
   "parserOptions": {

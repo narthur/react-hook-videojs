@@ -35,7 +35,8 @@ function App({ videoId }: { videoId: string }): JSX.Element {
 test("loads and displays a video", async () => {
   render(<App videoId="1" />);
 
-  await waitFor(() => screen.getByText("Ready: true"));
+  await screen.findByText("Ready: true");
+
   expect(screen.getByTitle("Play Video"));
   expect(screen.getByText("Ready: true"));
   expect(screen.getByText("player is object"));
@@ -48,6 +49,9 @@ test("works with createRoot", async () => {
 
   const root = createRoot(el);
 
+  // Disabled since we want to manually use createRoot here rather
+  // than using react-testing-library's render helper.
+  // eslint-disable-next-line testing-library/no-unnecessary-act
   act(() => {
     root.render(
       <StrictMode>
@@ -58,12 +62,11 @@ test("works with createRoot", async () => {
 
   const video = within(await screen.findByTestId("2"));
 
-  await waitFor(() => {
-    screen.getByText("Ready: true");
-    expect(video.getByTitle("Play Video"));
-    expect(screen.getByText("Ready: true"));
-    expect(screen.getByText("player is object"));
-  });
+  await screen.findByText("Ready: true");
+
+  expect(video.getByTitle("Play Video"));
+  expect(screen.getByText("Ready: true"));
+  expect(screen.getByText("player is object"));
 });
 
 // TODO:

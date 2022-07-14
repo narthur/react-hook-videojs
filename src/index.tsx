@@ -68,6 +68,7 @@ const loadVideoElement = async ({
 
     root.render(
       <div data-testid={videoId} data-vjs-player key={changedKey}>
+        {/* Disabled since we want to allow the user to use any valid <video> prop */}
         {/* eslint-disable-next-line react/jsx-props-no-spreading */}
         <video className={`video-js ${classNames}`} ref={mountVideo} {...props}>
           {children}
