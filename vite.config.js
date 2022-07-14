@@ -21,6 +21,7 @@ export default defineConfig({
         globals: {
           react: "React",
           "video.js": "videojs",
+          "react-dom": "ReactDOM",
         },
       },
     },
