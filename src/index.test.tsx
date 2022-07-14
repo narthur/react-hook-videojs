@@ -44,18 +44,11 @@ test("loads and displays a video", async () => {
 
 test("works with createRoot", async () => {
   function Concurrent({
-    children,
+    children: c,
   }: {
     children: React.ReactNode;
   }): JSX.Element {
-    return (
-      <div
-        ref={(el): void => {
-          if (!el) return;
-          createRoot(el).render(children);
-        }}
-      />
-    );
+    return <i ref={(l) => l && createRoot(l).render(c)} />;
   }
 
   render(
@@ -75,5 +68,4 @@ test("works with createRoot", async () => {
 
 // TODO:
 // Supports video children
-// Unmounts video on component unmount
 // Handles vjs option updates
