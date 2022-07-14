@@ -1,31 +1,13 @@
-import React, {
-  useEffect,
-  useCallback,
-  HTMLProps,
-  useReducer,
-  Reducer,
-} from "react";
+import React, { useEffect, useCallback, HTMLProps, useReducer } from "react";
 import videojs, { VideoJsPlayer, VideoJsPlayerOptions } from "video.js";
 import { createRoot } from "react-dom/client";
+import reducer from "./index.reducer";
 
 type VideoType = (
   props: {
     children?: React.ReactNode;
   } & Partial<HTMLProps<HTMLVideoElement>>
 ) => JSX.Element;
-
-type State = {
-  ready: boolean;
-  player?: VideoJsPlayer;
-  video?: HTMLVideoElement;
-  videoJsOptions: VideoJsPlayerOptions;
-  options?: {
-    classNames?: string;
-    videoId?: string;
-  };
-  props?: Partial<HTMLProps<HTMLVideoElement>>;
-  children?: React.ReactNode;
-};
 
 const loadedIds = new Set<string>();
 
@@ -78,39 +60,6 @@ const loadVideoElement = async ({
   });
 };
 
-type Action = {
-  type: "UPDATE";
-  payload: Partial<State>;
-};
-
-const updateState = (prev: State, next: Partial<State>): State => {
-  const keys = Object.keys(next) as Array<keyof State>;
-  const changedKeys = keys.filter((key) => {
-    if (key === "props") {
-      return JSON.stringify(prev[key]) !== JSON.stringify(next[key]);
-    }
-    return prev[key] !== next[key];
-  });
-
-  if (changedKeys.length === 0) {
-    return prev;
-  }
-
-  return {
-    ...prev,
-    ...next,
-  };
-};
-
-const reducer = (state: State, action: Action): State => {
-  switch (action.type) {
-    case "UPDATE":
-      return updateState(state, action.payload);
-    default:
-      return state;
-  }
-};
-
 export const useVideoJS = (
   videoJsOptions: VideoJsPlayerOptions,
   options: {
@@ -122,7 +71,7 @@ export const useVideoJS = (
   ready: boolean;
   player?: videojs.Player;
 } => {
-  const [state, dispatch] = useReducer<Reducer<State, Action>>(reducer, {
+  const [state, dispatch] = useReducer(reducer, {
     ready: false,
     videoJsOptions,
     options,
@@ -132,7 +81,6 @@ export const useVideoJS = (
   const Video = useCallback<VideoType>(
     ({ children, ...props }) => {
       useEffect(() => {
-        if (player) return;
         void loadVideoElement({
           videoJsOptions,
           options,
@@ -149,7 +97,7 @@ export const useVideoJS = (
           });
           dispatch({ type: "UPDATE", payload: result });
         });
-      }, [player]);
+      }, []);
 
       useEffect(() => {
         dispatch({ type: "UPDATE", payload: { children, props } });
