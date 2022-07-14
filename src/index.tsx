@@ -67,9 +67,10 @@ const loadVideoElement = async ({
     const root = createRoot(container);
 
     root.render(
-      <div data-testid={videoId} data-vjs-player={true} key={changedKey}>
-        <video ref={mountVideo} className={`video-js ${classNames}`} {...props}>
-          {/*{state.children}*/}
+      <div data-testid={videoId} data-vjs-player key={changedKey}>
+        {/* eslint-disable-next-line react/jsx-props-no-spreading */}
+        <video className={`video-js ${classNames}`} ref={mountVideo} {...props}>
+          {children}
         </video>
       </div>
     );

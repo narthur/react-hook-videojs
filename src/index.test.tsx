@@ -12,7 +12,7 @@ console.error = (...err): void => {
   }
 };
 
-const App = ({ videoId }: { videoId: string }): JSX.Element => {
+function App({ videoId }: { videoId: string }): JSX.Element {
   const videoJsOptions = {
     sources: [{ src: "example.com/oceans.mp4" }],
   };
@@ -30,10 +30,10 @@ const App = ({ videoId }: { videoId: string }): JSX.Element => {
       <Video />
     </div>
   );
-};
+}
 
 test("loads and displays a video", async () => {
-  render(<App videoId={"1"} />);
+  render(<App videoId="1" />);
 
   await waitFor(() => screen.getByText("Ready: true"));
   expect(screen.getByTitle("Play Video"));
@@ -51,7 +51,7 @@ test("works with createRoot", async () => {
   act(() => {
     root.render(
       <StrictMode>
-        <App videoId={"2"} />
+        <App videoId="2" />
       </StrictMode>
     );
   });
@@ -65,3 +65,8 @@ test("works with createRoot", async () => {
     expect(screen.getByText("player is object"));
   });
 });
+
+// TODO:
+// Supports video children
+// Unmounts video on component unmount
+// Handles vjs option updates
