@@ -23,7 +23,10 @@ export const useVideoJS = (
   const [state, dispatch] = useReducer(reducer, {
     ready: false,
     videoJsOptions,
-    options,
+    options: {
+      classNames: options.classNames ?? "",
+      videoId: options.videoId ?? Math.random().toString(),
+    },
   });
   const { video, player, ready } = state;
 
@@ -31,21 +34,27 @@ export const useVideoJS = (
     ({ children, ...props }) => {
       useEffect(() => {
         void loadVideoElement({
-          videoJsOptions,
-          options,
+          ...state,
           props,
           children,
-        }).then((result) => {
-          result.player.ready(() => {
+          onMount: (result) => {
+            dispatch({ type: "UPDATE", payload: result });
+          },
+          onReady: () => {
             dispatch({
               type: "UPDATE",
               payload: {
                 ready: true,
               },
             });
-          });
-          dispatch({ type: "UPDATE", payload: result });
+          },
         });
+
+        return () => {
+          if (player && !player.isDisposed()) {
+            player.dispose();
+          }
+        };
       }, []);
 
       useEffect(() => {

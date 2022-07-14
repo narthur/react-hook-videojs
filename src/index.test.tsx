@@ -1,8 +1,9 @@
 import React, { StrictMode } from "react";
-import { render, screen, act, within } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { useVideoJS } from "./index";
 import { createRoot } from "react-dom/client";
 
+/* eslint-disable no-console */
 const consoleError = console.error;
 console.error = (...err): void => {
   if (err[2] === "(CODE:4 MEDIA_ERR_SRC_NOT_SUPPORTED)") {
@@ -11,14 +12,13 @@ console.error = (...err): void => {
     consoleError(...err);
   }
 };
+/* eslint-enable no-console */
 
-function App({ videoId }: { videoId: string }): JSX.Element {
+function App(): JSX.Element {
   const videoJsOptions = {
     sources: [{ src: "example.com/oceans.mp4" }],
   };
-  const { Video, ready, player } = useVideoJS(videoJsOptions, {
-    videoId,
-  });
+  const { Video, ready, player } = useVideoJS(videoJsOptions);
   return (
     <div>
       <div>{ready ? "Ready: true" : "Ready: false"}</div>
@@ -33,7 +33,7 @@ function App({ videoId }: { videoId: string }): JSX.Element {
 }
 
 test("loads and displays a video", async () => {
-  render(<App videoId="1" />);
+  render(<App />);
 
   await screen.findByText("Ready: true");
 
@@ -43,28 +43,32 @@ test("loads and displays a video", async () => {
 });
 
 test("works with createRoot", async () => {
-  render(<div data-testid="root" />);
-
-  const el = screen.getByTestId("root");
-
-  const root = createRoot(el);
-
-  // Disabled since we want to manually use createRoot here rather
-  // than using react-testing-library's render helper.
-  // eslint-disable-next-line testing-library/no-unnecessary-act
-  act(() => {
-    root.render(
-      <StrictMode>
-        <App videoId="2" />
-      </StrictMode>
+  function Concurrent({
+    children,
+  }: {
+    children: React.ReactNode;
+  }): JSX.Element {
+    return (
+      <div
+        ref={(el): void => {
+          if (!el) return;
+          createRoot(el).render(children);
+        }}
+      />
     );
-  });
+  }
 
-  const video = within(await screen.findByTestId("2"));
+  render(
+    <StrictMode>
+      <Concurrent>
+        <App />
+      </Concurrent>
+    </StrictMode>
+  );
 
   await screen.findByText("Ready: true");
 
-  expect(video.getByTitle("Play Video"));
+  expect(screen.getByTitle("Play Video"));
   expect(screen.getByText("Ready: true"));
   expect(screen.getByText("player is object"));
 });

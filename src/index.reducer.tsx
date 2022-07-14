@@ -6,20 +6,22 @@ type State = {
   player?: VideoJsPlayer;
   video?: HTMLVideoElement;
   videoJsOptions: VideoJsPlayerOptions;
-  options?: {
-    classNames?: string;
-    videoId?: string;
+  options: {
+    classNames: string;
+    videoId: string;
   };
   props?: Partial<HTMLProps<HTMLVideoElement>>;
   children?: React.ReactNode;
 };
 
+type Delta = Partial<State>;
+
 type Action = {
   type: "UPDATE";
-  payload: Partial<State>;
+  payload: Delta;
 };
 
-const updateState = (prev: State, next: Partial<State>): State => {
+const updateState = (prev: State, next: Delta): State => {
   const keys = Object.keys(next) as Array<keyof State>;
   const changedKeys = keys.filter((key) => {
     if (key === "props") {

@@ -4,25 +4,31 @@ import { createRoot } from "react-dom/client";
 
 const loadedIds = new Set<string>();
 
+type ReturnType = {
+  video: HTMLVideoElement;
+  player: VideoJsPlayer;
+};
+
 const loadVideoElement = async ({
   videoJsOptions,
   options,
   props,
   children,
+  onMount,
+  onReady,
 }: {
   videoJsOptions: VideoJsPlayerOptions;
   options: {
     classNames?: string;
-    videoId?: string;
+    videoId: string;
   };
   props?: Partial<HTMLProps<HTMLVideoElement>>;
   children?: React.ReactNode;
-}): Promise<{
-  video: HTMLVideoElement;
-  player: VideoJsPlayer;
-}> => {
+  onMount?: (result: ReturnType) => void;
+  onReady?: () => void;
+}): Promise<ReturnType> => {
   return new Promise((resolve) => {
-    const { videoId = "video", classNames = "" } = options || {};
+    const { videoId, classNames = "" } = options || {};
     const changedKey = `${videoId}-${JSON.stringify(videoJsOptions)}`;
 
     if (loadedIds.has(changedKey)) return;
@@ -35,8 +41,11 @@ const loadVideoElement = async ({
 
     const mountVideo = (video: HTMLVideoElement | null): void => {
       if (!video) return;
-      const player = videojs(video, videoJsOptions);
-      resolve({ video, player });
+      const player = videojs(video, videoJsOptions, onReady);
+      const result = { video, player };
+
+      onMount && onMount(result);
+      resolve(result);
     };
 
     const root = createRoot(container);

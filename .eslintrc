@@ -22,6 +22,16 @@
       "error",
       { "extensions": [".jsx", ".tsx"] }
     ],
-    "react/jsx-no-bind": ["error", { "ignoreRefs": true }]
-  }
+    "react/jsx-no-bind": ["error", { "ignoreRefs": true }],
+    "react/jsx-no-literals": "off",
+    "no-console": "error"
+  },
+  "overrides": [
+    {
+      "files": ["*.spec.*", "*.test.*"],
+      "rules": {
+        "react/no-multi-comp": "off"
+      }
+    }
+  ]
 }
