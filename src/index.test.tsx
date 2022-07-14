@@ -1,5 +1,5 @@
 import React, { StrictMode } from "react";
-import { render, waitFor, screen, act, within } from "@testing-library/react";
+import { render, screen, act, within } from "@testing-library/react";
 import { useVideoJS } from "./index";
 import { createRoot } from "react-dom/client";
 
