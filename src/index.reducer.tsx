@@ -21,22 +21,27 @@ type Action = {
   payload: Delta;
 };
 
-const updateState = (prev: State, next: Delta): State => {
-  const keys = Object.keys(next) as Array<keyof State>;
-  const changedKeys = keys.filter((key) => {
-    if (key === "props") {
-      return JSON.stringify(prev[key]) !== JSON.stringify(next[key]);
+const updateState = (s: State, d: Delta): State => {
+  const keys = Object.keys(d) as Array<keyof State>;
+  const changed = keys.filter((k) => {
+    if (["props", "videoJsOptions"].includes(k)) {
+      return JSON.stringify(s[k]) !== JSON.stringify(d[k]);
     }
-    return prev[key] !== next[key];
+    return s[k] !== d[k];
   });
 
-  if (changedKeys.length === 0) {
-    return prev;
+  if (changed.length === 0) {
+    return s;
+  }
+
+  if (changed.includes("videoJsOptions")) {
+    const src = d?.videoJsOptions?.sources;
+    src && s.player?.src(src);
   }
 
   return {
-    ...prev,
-    ...next,
+    ...s,
+    ...d,
   };
 };
 

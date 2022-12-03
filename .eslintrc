@@ -4,7 +4,7 @@
   "plugins": ["@typescript-eslint"],
   "extends": [
     "eslint:recommended",
-    "plugin:react/all",
+    "plugin:react/recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:testing-library/react",
@@ -25,16 +25,6 @@
       "error",
       { "extensions": [".jsx", ".tsx"] }
     ],
-    "react/jsx-no-bind": ["error", { "ignoreRefs": true }],
-    "react/jsx-no-literals": "off",
     "no-console": "error"
-  },
-  "overrides": [
-    {
-      "files": ["*.spec.*", "*.test.*"],
-      "rules": {
-        "react/no-multi-comp": "off"
-      }
-    }
-  ]
+  }
 }

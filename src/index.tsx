@@ -30,6 +30,10 @@ export const useVideoJS = (
   });
   const { video, player, ready } = state;
 
+  useEffect(() => {
+    dispatch({ type: "UPDATE", payload: { videoJsOptions } });
+  }, [videoJsOptions]);
+
   const Video = useCallback<VideoType>(
     ({ children, ...props }) => {
       useEffect(() => {

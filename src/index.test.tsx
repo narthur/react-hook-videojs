@@ -2,6 +2,7 @@ import React, { StrictMode } from "react";
 import { render, screen } from "@testing-library/react";
 import { useVideoJS } from "./index";
 import { createRoot } from "react-dom/client";
+import { VideoJsPlayer, VideoJsPlayerOptions } from "video.js";
 
 /* eslint-disable no-console */
 const consoleError = console.error;
@@ -14,19 +15,29 @@ console.error = (...err): void => {
 };
 /* eslint-enable no-console */
 
-function App(): JSX.Element {
-  const videoJsOptions = {
+function App(props: {
+  getOutput?: (p: VideoJsPlayer | undefined) => string;
+  videoJsOptions?: VideoJsPlayerOptions;
+}): JSX.Element {
+  const { Video, ready, player } = useVideoJS({
     sources: [{ src: "example.com/oceans.mp4" }],
-  };
-  const { Video, ready, player } = useVideoJS(videoJsOptions);
+    ...props.videoJsOptions,
+  });
+
+  const {
+    getOutput = (p): string => {
+      return typeof p === "object" && p !== null
+        ? "player is object"
+        : "player is NOT object but should be";
+    },
+  } = props;
+
+  const output = getOutput(player);
+
   return (
     <div>
       <div>{ready ? "Ready: true" : "Ready: false"}</div>
-      <div>
-        {typeof player === "object" && player !== null
-          ? "player is object"
-          : "player is NOT object but should be"}
-      </div>
+      <div>{output}</div>
       <Video />
     </div>
   );
@@ -64,6 +75,36 @@ test("works with createRoot", async () => {
   expect(screen.getByTitle("Play Video"));
   expect(screen.getByText("Ready: true"));
   expect(screen.getByText("player is object"));
+});
+
+test('handles "src" prop change', async () => {
+  function out(p: VideoJsPlayer | undefined): string {
+    return p?.src() ?? "";
+  }
+
+  const view = render(
+    <App
+      getOutput={out}
+      videoJsOptions={{
+        sources: [{ src: "example.com/oceans.mp4" }],
+      }}
+    />
+  );
+
+  await screen.findByText("example.com/oceans.mp4");
+
+  view.rerender(
+    <App
+      getOutput={out}
+      videoJsOptions={{
+        sources: [{ src: "example.com/beaches.mp4" }],
+      }}
+    />
+  );
+
+  await expect(
+    screen.findByText("example.com/beaches.mp4")
+  ).resolves.toBeInTheDocument();
 });
 
 // TODO:
